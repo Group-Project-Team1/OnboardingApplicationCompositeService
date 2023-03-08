@@ -4,6 +4,7 @@ import com.example.onboardingapplicationcompositeservice.domain.request.Applicat
 import com.example.onboardingapplicationcompositeservice.service.OnboardingApplicationCompositeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -18,12 +19,12 @@ public class OnboardingApplicationCompositeController {
         this.onboardingApplicationCompositeService = onboardingApplicationCompositeService;
     }
 
-    @PostMapping("{employeeId}/applicationForm")
+    @PostMapping(value = "{employeeId}/applicationForm")
     public ResponseEntity<Object> submitApplicationForm(@PathVariable("employeeId") Integer employeeId,
-                                                        @RequestBody ApplicationFormRequest applicationFormRequest
-//                                                        @RequestPart("driverLicense") MultipartFile driverLicense,
-                                                       /* @RequestPart("OPTReceiptURL") MultipartFile OPTReceiptURL */){
-        onboardingApplicationCompositeService.submitApplicationForm(employeeId, applicationFormRequest);
+                                                        @RequestPart("applicationFormRequest") ApplicationFormRequest applicationFormRequest,
+                                                        @RequestPart("driverLicense") MultipartFile driverLicense,
+                                                        @RequestPart("OPTReceipt") MultipartFile OPTReceipt){
+        onboardingApplicationCompositeService.submitApplicationForm(employeeId, applicationFormRequest, driverLicense, OPTReceipt);
         return new ResponseEntity<>("Application form submitted successfully", HttpStatus.OK);
     }
 }

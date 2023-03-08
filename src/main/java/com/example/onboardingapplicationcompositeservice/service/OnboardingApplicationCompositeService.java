@@ -36,9 +36,9 @@ public class OnboardingApplicationCompositeService {
     }
 
     public void submitApplicationForm(Integer employeeId,
-                                      ApplicationFormRequest applicationFormRequest
-//                                      MultipartFile driverLicense,
-                                     /* MultipartFile OPTReceipt */){
+                                      ApplicationFormRequest applicationFormRequest,
+                                      MultipartFile driverLicense,
+                                      MultipartFile OPTReceipt){
 
         // update employee info in mongoDB
         Employee employee = employeeService.findEmployeeById(employeeId);
@@ -62,28 +62,28 @@ public class OnboardingApplicationCompositeService {
         employee.setContacts(applicationFormRequest.getContacts());
         employeeService.updateEmployee(employee);
 //
-//        if(driverLicense != null){
-//            // upload driverLicense and update personalDocuments in mongoDB
-//            String driverLicenseFileName = applicationService.uploadFile(driverLicense).getBody().toString();
-//            PersonalDocument personalDocument = new PersonalDocument();
-//            String driverLicenseURL = applicationService.getFileUrl(driverLicenseFileName).getBody().toString();
-//            personalDocument.setTitle("Driver License");
-//            personalDocument.setPath(driverLicenseURL);
-//            personalDocument.setCreateDate(Timestamp.valueOf(LocalDateTime.now()));
-//            employeeService.addPersonalDocument(employeeId, personalDocument);
-//        }
+        if(driverLicense != null){
+            // upload driverLicense and update personalDocuments in mongoDB
+            String driverLicenseFileName = applicationService.uploadFile(driverLicense);
+            PersonalDocument personalDocument = new PersonalDocument();
+            String driverLicenseURL = applicationService.getFileUrl(driverLicenseFileName);
+            personalDocument.setTitle("Driver License");
+            personalDocument.setPath(driverLicenseURL);
+            personalDocument.setCreateDate(Timestamp.valueOf(LocalDateTime.now()));
+            employeeService.addPersonalDocument(employeeId, personalDocument);
+        }
 
-//        if(OPTReceipt != null){
-//            // upload OPT Receipt and update personalDocuments in mongoDB
-//            String OPTFileName = applicationService.uploadFile(OPTReceipt).getBody().toString();
-//            PersonalDocument personalDocument = new PersonalDocument();
-//            String OPTReceiptURL = applicationService.getFileUrl(OPTFileName).getBody().toString();
-//            personalDocument.setTitle("OPT Receipt");
-//            personalDocument.setPath(OPTReceiptURL);
-//            personalDocument.setCreateDate(Timestamp.valueOf(LocalDateTime.now()));
-//            employeeService.addPersonalDocument(employeeId, personalDocument);
-//            applicationService.submitApplicationForm(employeeId, OPTReceiptURL);
-//        }
+        if(OPTReceipt != null){
+            // upload OPT Receipt and update personalDocuments in mongoDB
+            String OPTFileName = applicationService.uploadFile(OPTReceipt);
+            PersonalDocument personalDocument = new PersonalDocument();
+            String OPTReceiptURL = applicationService.getFileUrl(OPTFileName);
+            personalDocument.setTitle("OPT Receipt");
+            personalDocument.setPath(OPTReceiptURL);
+            personalDocument.setCreateDate(Timestamp.valueOf(LocalDateTime.now()));
+            employeeService.addPersonalDocument(employeeId, personalDocument);
+            applicationService.submitApplicationForm(employeeId, OPTReceiptURL);
+        }
 
     }
 }

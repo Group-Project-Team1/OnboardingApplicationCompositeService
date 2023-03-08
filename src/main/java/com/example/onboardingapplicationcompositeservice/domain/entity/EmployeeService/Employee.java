@@ -3,6 +3,7 @@ package com.example.onboardingapplicationcompositeservice.domain.entity.Employee
 import lombok.*;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -32,7 +33,7 @@ public class Employee {
     private List<Contact> contacts;
     private List<Address> addresses;
     private List<VisaStatus> visaStatuses;
-    private List<PersonalDocument> personalDocuments;
+    private List<PersonalDocument> personalDocuments = new ArrayList<>();
 
 
 }
