@@ -1,10 +1,16 @@
 package com.example.onboardingapplicationcompositeservice.service;
 
+import com.example.onboardingapplicationcompositeservice.domain.entity.ApplicationService.ApplicationWorkFlow;
+import com.example.onboardingapplicationcompositeservice.domain.entity.ApplicationService.DigitalDocument;
 import com.example.onboardingapplicationcompositeservice.domain.entity.EmployeeService.Address;
 import com.example.onboardingapplicationcompositeservice.domain.entity.EmployeeService.PersonalDocument;
 import com.example.onboardingapplicationcompositeservice.domain.entity.EmployeeService.Employee;
 import com.example.onboardingapplicationcompositeservice.domain.entity.EmployeeService.VisaStatus;
 import com.example.onboardingapplicationcompositeservice.domain.request.ApplicationFormRequest;
+import com.example.onboardingapplicationcompositeservice.domain.response.AllApplicationResponse;
+import com.example.onboardingapplicationcompositeservice.domain.response.ApplicationInfoResponse;
+import com.example.onboardingapplicationcompositeservice.domain.response.ApplicationResponse;
+import com.example.onboardingapplicationcompositeservice.domain.response.VisaStatusManagementResponse;
 import com.example.onboardingapplicationcompositeservice.service.remote.RemoteApplicationService;
 import com.example.onboardingapplicationcompositeservice.service.remote.RemoteEmployeeService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +18,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -86,4 +93,59 @@ public class OnboardingApplicationCompositeService {
         }
 
     }
+
+
+    public void submitApplication(Integer employeeId, List<MultipartFile> files){
+        List<DigitalDocument> digitalDocumentList = applicationService.getDocuments();
+        for(int i = 0; i < digitalDocumentList.size(); i++){
+            String fileName = applicationService.uploadFile(files.get(i));
+            String fileTile = digitalDocumentList.get(i).getTitle();
+            PersonalDocument personalDocument = new PersonalDocument();
+            String url = applicationService.getFileUrl(fileName);
+            personalDocument.setTitle(fileTile);
+            personalDocument.setPath(url);
+            personalDocument.setCreateDate(Timestamp.valueOf(LocalDateTime.now()));
+            employeeService.addPersonalDocument(employeeId, personalDocument);
+        }
+        applicationService.submitApplication(employeeId);
+
+    }
+
+    public Employee findEmployeeById(Integer employeeId){
+        return employeeService.findEmployeeById(employeeId);
+    }
+
+    public ApplicationWorkFlow getApplicationByEmployeeId(Integer employeeId){
+        return applicationService.getApplicationByEmployeeId(employeeId);
+    }
+
+    public AllApplicationResponse getApplicationsByStatus(String status){
+        List<ApplicationWorkFlow> applications = applicationService.getApplicationsByStatus(status);
+        List<ApplicationInfoResponse> applicationInfoResponses = new ArrayList<>();
+        for(ApplicationWorkFlow applicationWorkFlow : applications){
+            Employee employee = employeeService.findEmployeeById(applicationWorkFlow.getEmployeeId());
+            applicationInfoResponses.add(ApplicationInfoResponse.builder()
+                    .fullName(employee.getFirstName() + " " + employee.getLastName())
+                    .email(employee.getEmail())
+                    .status(applicationWorkFlow.getStatus())
+                    .build());
+        }
+        return AllApplicationResponse.builder().applicationInfos(applicationInfoResponses).build();
+    }
+
+    public void submitVisaDocuments(Integer employeeId, MultipartFile file, Integer fileId, String fileType){
+        String fileName = applicationService.uploadFile(file);
+        PersonalDocument personalDocument = new PersonalDocument();
+        String url = applicationService.getFileUrl(fileName);
+        personalDocument.setTitle(fileType);
+        personalDocument.setPath(url);
+        personalDocument.setCreateDate(Timestamp.valueOf(LocalDateTime.now()));
+        employeeService.addPersonalDocument(employeeId, personalDocument);
+        applicationService.submitVisaDocuments(employeeId, fileId);
+    }
+
+    public VisaStatusManagementResponse getVisaStatus(Integer employeeId){
+        return applicationService.getVisaStatus(employeeId);
+    }
+
 }
