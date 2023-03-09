@@ -5,6 +5,7 @@ import com.example.onboardingapplicationcompositeservice.domain.response.HouseRe
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestHeader;
 
 @FeignClient("housing-service")
 public interface RemoteHousingService {
@@ -12,5 +13,5 @@ public interface RemoteHousingService {
     AllHouseResponse findAllHouses();
 
     @GetMapping("housing-service/house/{id}")
-    HouseResponse findHouseById(@PathVariable Integer id);
+    HouseResponse findHouseById(@RequestHeader(value = "Authorization", required = true) String authorizationHeader, @PathVariable Integer id);
 }

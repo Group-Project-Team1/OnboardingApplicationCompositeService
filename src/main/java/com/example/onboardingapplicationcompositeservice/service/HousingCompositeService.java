@@ -29,7 +29,7 @@ public class HousingCompositeService {
         return employeeService.findEmployeeById(employeeId);
     }
 
-    public House findHouseById(Integer houseId) { return housingService.findHouseById(houseId).getHouse(); }
+    public House findHouseById(String token, Integer houseId) { return housingService.findHouseById(token, houseId).getHouse(); }
 
     public List<EmployeeSummary> findEmployeeSummariesByHouseId(Integer houseId){
         ResponseEntity<Object> responseEntity = employeeService.findEmployeeSummariesByHouseId(houseId);
