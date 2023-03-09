@@ -2,6 +2,7 @@ package com.example.onboardingapplicationcompositeservice.service.remote;
 
 import com.example.onboardingapplicationcompositeservice.domain.entity.EmployeeService.Employee;
 import com.example.onboardingapplicationcompositeservice.domain.entity.EmployeeService.PersonalDocument;
+import com.example.onboardingapplicationcompositeservice.domain.response.AllHouseResponse;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,5 +20,9 @@ public interface RemoteEmployeeService {
 
     @PostMapping("employee-service/employee/{id}/addPersonalDocument")
     ResponseEntity<Object> addPersonalDocument(@PathVariable("id") Integer id, @RequestBody PersonalDocument personalDocument);
+
+    @GetMapping("employee-service/hr/housing")
+    ResponseEntity<Object> findEmployeeSummariesByHouseId(@RequestParam("houseId") Integer houseId);
+
 
 }
