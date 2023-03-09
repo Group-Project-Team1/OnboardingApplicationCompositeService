@@ -6,10 +6,13 @@ import com.example.onboardingapplicationcompositeservice.domain.response.Employe
 import com.example.onboardingapplicationcompositeservice.domain.response.HouseDetailResponse;
 import com.example.onboardingapplicationcompositeservice.domain.response.HouseInfoResponse;
 import com.example.onboardingapplicationcompositeservice.domain.response.Roommate;
+import com.example.onboardingapplicationcompositeservice.security.AuthUserDetail;
+import com.example.onboardingapplicationcompositeservice.security.JwtProvider;
 import com.example.onboardingapplicationcompositeservice.service.HousingCompositeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,16 +25,19 @@ import java.util.stream.Collectors;
 @RequestMapping("composite-housing")
 public class HousingCompositeController {
 
+    JwtProvider jwtProvider;
+
     HousingCompositeService housingCompositeService;
     @Autowired
-    public HousingCompositeController(HousingCompositeService housingCompositeService) {
+    public HousingCompositeController(HousingCompositeService housingCompositeService, JwtProvider jwtProvider) {
         this.housingCompositeService = housingCompositeService;
+        this.jwtProvider = jwtProvider;
     }
 
     @GetMapping("user-house-info/{employeeId}")
     public HouseInfoResponse getUserHouseInfo(@PathVariable Integer employeeId){
         Employee employee = housingCompositeService.findEmployeeById(employeeId);
-        House house = housingCompositeService.findHouseById(employee.getHouseId());
+        House house = housingCompositeService.findHouseById( "Bearer:"+jwtProvider.createToken((AuthUserDetail) SecurityContextHolder.getContext().getAuthentication().getPrincipal()), employee.getHouseId());
         List<EmployeeSummary> employeeSummaries = housingCompositeService.findEmployeeSummariesByHouseId(employee.getHouseId());
 
         return HouseInfoResponse.builder()
@@ -43,7 +49,8 @@ public class HousingCompositeController {
 
     @GetMapping("house-detail/{houseId}")
     public HouseDetailResponse getHouseDetail(@PathVariable Integer houseId){
-        House house = housingCompositeService.findHouseById(houseId);
+
+        House house = housingCompositeService.findHouseById("Bearer:"+jwtProvider.createToken((AuthUserDetail) SecurityContextHolder.getContext().getAuthentication().getPrincipal()), houseId);
         List<EmployeeSummary> employeeSummaries = housingCompositeService.findEmployeeSummariesByHouseId(houseId);
 
         return HouseDetailResponse.builder()
