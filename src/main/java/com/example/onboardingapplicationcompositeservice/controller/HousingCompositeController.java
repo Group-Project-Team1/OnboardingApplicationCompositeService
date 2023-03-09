@@ -13,7 +13,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -35,13 +38,19 @@ public class HousingCompositeController {
         this.jwtProvider = jwtProvider;
     }
 
-    @GetMapping("user-house-info/{employeeId}")
-    @PreAuthorize("hasAuthority('employee')")
-    public HouseInfoResponse getUserHouseInfo(@PathVariable Integer employeeId){
-        Employee employee = housingCompositeService.findEmployeeById("Bearer:"+jwtProvider.createToken((AuthUserDetail) SecurityContextHolder.getContext().getAuthentication().getPrincipal()), employeeId);
-        House house = housingCompositeService.findHouseById( "Bearer:"+jwtProvider.createToken((AuthUserDetail) SecurityContextHolder.getContext().getAuthentication().getPrincipal()), employee.getHouseId());
-        List<EmployeeSummary> employeeSummaries = housingCompositeService.findEmployeeSummariesByHouseId("Bearer:"+jwtProvider.createToken((AuthUserDetail) SecurityContextHolder.getContext().getAuthentication().getPrincipal()),employee.getHouseId());
 
+    @GetMapping("user-house-info")
+    @PreAuthorize("hasAuthority('employee')")
+    public HouseInfoResponse getUserHouseInfo(){
+        AuthUserDetail authUserDetail = (AuthUserDetail)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Integer employeeId = authUserDetail.getUserId();
+        List<GrantedAuthority> userAuthorities = (List<GrantedAuthority>) authUserDetail.getAuthorities();
+        userAuthorities.add(new SimpleGrantedAuthority("hr"));
+        String token = "Bearer:"+jwtProvider.createToken(authUserDetail);
+
+        Employee employee = housingCompositeService.findEmployeeById(token, employeeId);
+        House house = housingCompositeService.findHouseById( token, employee.getHouseId());
+        List<EmployeeSummary> employeeSummaries = housingCompositeService.findEmployeeSummariesByHouseId(token,employee.getHouseId());
         return HouseInfoResponse.builder()
                 .address(house.getAddress())
                 .roommates(employeeSummaries.stream().map(a -> new Roommate(a.getName(), a.getPhoneNumber())).collect(Collectors.toList()))
