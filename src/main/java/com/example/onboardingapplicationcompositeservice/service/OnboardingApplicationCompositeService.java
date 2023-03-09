@@ -11,11 +11,13 @@ import com.example.onboardingapplicationcompositeservice.domain.response.AllAppl
 import com.example.onboardingapplicationcompositeservice.domain.response.ApplicationInfoResponse;
 import com.example.onboardingapplicationcompositeservice.domain.response.ApplicationResponse;
 import com.example.onboardingapplicationcompositeservice.domain.response.VisaStatusManagementResponse;
+import com.example.onboardingapplicationcompositeservice.security.AuthUserDetail;
 import com.example.onboardingapplicationcompositeservice.service.remote.RemoteApplicationService;
 import com.example.onboardingapplicationcompositeservice.service.remote.RemoteEmployeeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -42,13 +44,14 @@ public class OnboardingApplicationCompositeService {
         this.applicationService = applicationService;
     }
 
-    public void submitApplicationForm(Integer employeeId,
+    public void submitApplicationForm(String token,
+                                      Integer employeeId,
                                       ApplicationFormRequest applicationFormRequest,
                                       MultipartFile driverLicense,
                                       MultipartFile OPTReceipt){
 
         // update employee info in mongoDB
-        Employee employee = employeeService.findEmployeeById(employeeId);
+        Employee employee = employeeService.findEmployeeById(token,employeeId);
         employee.setFirstName(applicationFormRequest.getFirstName());
         employee.setLastName(applicationFormRequest.getLastName());
         employee.setMiddleName(applicationFormRequest.getMiddleName());
@@ -67,63 +70,63 @@ public class OnboardingApplicationCompositeService {
         employee.setDriverLicense(applicationFormRequest.getDriverLicenseNumber());
         employee.setDriverLicenseExpiration(applicationFormRequest.getExpirationDate());
         employee.setContacts(applicationFormRequest.getContacts());
-        employeeService.updateEmployee(employee);
+        employeeService.updateEmployee(token, employee);
 //
         if(driverLicense != null){
             // upload driverLicense and update personalDocuments in mongoDB
-            String driverLicenseFileName = applicationService.uploadFile(driverLicense);
+            String driverLicenseFileName = applicationService.uploadFile(token, driverLicense);
             PersonalDocument personalDocument = new PersonalDocument();
-            String driverLicenseURL = applicationService.getFileUrl(driverLicenseFileName);
+            String driverLicenseURL = applicationService.getFileUrl(token, driverLicenseFileName);
             personalDocument.setTitle("Driver License");
             personalDocument.setPath(driverLicenseURL);
             personalDocument.setCreateDate(Timestamp.valueOf(LocalDateTime.now()));
-            employeeService.addPersonalDocument(employeeId, personalDocument);
+            employeeService.addPersonalDocument(token, employeeId, personalDocument);
         }
 
         if(OPTReceipt != null){
             // upload OPT Receipt and update personalDocuments in mongoDB
-            String OPTFileName = applicationService.uploadFile(OPTReceipt);
+            String OPTFileName = applicationService.uploadFile(token, OPTReceipt);
             PersonalDocument personalDocument = new PersonalDocument();
-            String OPTReceiptURL = applicationService.getFileUrl(OPTFileName);
+            String OPTReceiptURL = applicationService.getFileUrl(token, OPTFileName);
             personalDocument.setTitle("OPT Receipt");
             personalDocument.setPath(OPTReceiptURL);
             personalDocument.setCreateDate(Timestamp.valueOf(LocalDateTime.now()));
-            employeeService.addPersonalDocument(employeeId, personalDocument);
-            applicationService.submitApplicationForm(employeeId, OPTReceiptURL);
+            employeeService.addPersonalDocument(token, employeeId, personalDocument);
+            applicationService.submitApplicationForm(token, employeeId, OPTReceiptURL);
         }
 
     }
 
 
-    public void submitApplication(Integer employeeId, List<MultipartFile> files){
-        List<DigitalDocument> digitalDocumentList = applicationService.getDocuments();
+    public void submitApplication(String token, Integer employeeId, List<MultipartFile> files){
+        List<DigitalDocument> digitalDocumentList = applicationService.getDocuments(token);
         for(int i = 0; i < digitalDocumentList.size(); i++){
-            String fileName = applicationService.uploadFile(files.get(i));
+            String fileName = applicationService.uploadFile(token, files.get(i));
             String fileTile = digitalDocumentList.get(i).getTitle();
             PersonalDocument personalDocument = new PersonalDocument();
-            String url = applicationService.getFileUrl(fileName);
+            String url = applicationService.getFileUrl(token, fileName);
             personalDocument.setTitle(fileTile);
             personalDocument.setPath(url);
             personalDocument.setCreateDate(Timestamp.valueOf(LocalDateTime.now()));
-            employeeService.addPersonalDocument(employeeId, personalDocument);
+            employeeService.addPersonalDocument(token, employeeId, personalDocument);
         }
-        applicationService.submitApplication(employeeId);
+        applicationService.submitApplication(token, employeeId);
 
     }
 
-    public Employee findEmployeeById(Integer employeeId){
-        return employeeService.findEmployeeById(employeeId);
+    public Employee findEmployeeById(String token, Integer employeeId){
+        return employeeService.findEmployeeById(token, employeeId);
     }
 
-    public ApplicationWorkFlow getApplicationByEmployeeId(Integer employeeId){
-        return applicationService.getApplicationByEmployeeId(employeeId);
+    public ApplicationWorkFlow getApplicationByEmployeeId(String token, Integer employeeId){
+        return applicationService.getApplicationByEmployeeId(token, employeeId);
     }
 
-    public AllApplicationResponse getApplicationsByStatus(String status){
-        List<ApplicationWorkFlow> applications = applicationService.getApplicationsByStatus(status);
+    public AllApplicationResponse getApplicationsByStatus(String token, String status){
+        List<ApplicationWorkFlow> applications = applicationService.getApplicationsByStatus(token, status);
         List<ApplicationInfoResponse> applicationInfoResponses = new ArrayList<>();
         for(ApplicationWorkFlow applicationWorkFlow : applications){
-            Employee employee = employeeService.findEmployeeById(applicationWorkFlow.getEmployeeId());
+            Employee employee = employeeService.findEmployeeById(token, applicationWorkFlow.getEmployeeId());
             applicationInfoResponses.add(ApplicationInfoResponse.builder()
                     .fullName(employee.getFirstName() + " " + employee.getLastName())
                     .email(employee.getEmail())
@@ -133,19 +136,19 @@ public class OnboardingApplicationCompositeService {
         return AllApplicationResponse.builder().applicationInfos(applicationInfoResponses).build();
     }
 
-    public void submitVisaDocuments(Integer employeeId, MultipartFile file, Integer fileId, String fileType){
-        String fileName = applicationService.uploadFile(file);
+    public void submitVisaDocuments(String token, Integer employeeId, MultipartFile file, Integer fileId, String fileType){
+        String fileName = applicationService.uploadFile(token, file);
         PersonalDocument personalDocument = new PersonalDocument();
-        String url = applicationService.getFileUrl(fileName);
+        String url = applicationService.getFileUrl(token, fileName);
         personalDocument.setTitle(fileType);
         personalDocument.setPath(url);
         personalDocument.setCreateDate(Timestamp.valueOf(LocalDateTime.now()));
-        employeeService.addPersonalDocument(employeeId, personalDocument);
-        applicationService.submitVisaDocuments(employeeId, fileId);
+        employeeService.addPersonalDocument(token, employeeId, personalDocument);
+        applicationService.submitVisaDocuments(token, employeeId, fileId);
     }
 
-    public VisaStatusManagementResponse getVisaStatus(Integer employeeId){
-        return applicationService.getVisaStatus(employeeId);
+    public VisaStatusManagementResponse getVisaStatus(String token, Integer employeeId){
+        return applicationService.getVisaStatus(token, employeeId);
     }
 
 }
