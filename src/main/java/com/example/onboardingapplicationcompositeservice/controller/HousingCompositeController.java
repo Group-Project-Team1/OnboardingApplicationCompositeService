@@ -12,6 +12,7 @@ import com.example.onboardingapplicationcompositeservice.service.HousingComposit
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -35,6 +36,7 @@ public class HousingCompositeController {
     }
 
     @GetMapping("user-house-info/{employeeId}")
+    @PreAuthorize("hasAuthority('employee')")
     public HouseInfoResponse getUserHouseInfo(@PathVariable Integer employeeId){
         Employee employee = housingCompositeService.findEmployeeById(employeeId);
         House house = housingCompositeService.findHouseById( "Bearer:"+jwtProvider.createToken((AuthUserDetail) SecurityContextHolder.getContext().getAuthentication().getPrincipal()), employee.getHouseId());
@@ -48,6 +50,7 @@ public class HousingCompositeController {
     }
 
     @GetMapping("house-detail/{houseId}")
+    @PreAuthorize("hasAuthority('hr')")
     public HouseDetailResponse getHouseDetail(@PathVariable Integer houseId){
 
         House house = housingCompositeService.findHouseById("Bearer:"+jwtProvider.createToken((AuthUserDetail) SecurityContextHolder.getContext().getAuthentication().getPrincipal()), houseId);
