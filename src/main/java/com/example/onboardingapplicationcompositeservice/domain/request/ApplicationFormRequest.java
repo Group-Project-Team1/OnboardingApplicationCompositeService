@@ -32,8 +32,7 @@ public class ApplicationFormRequest {
     private LocalDate dateOfBirth;
     private String SSN;
     //    private Car car;
-    private Boolean isCitizenOrGreenCard;
-    private String identity; // citizen or green card or Visa
+
     private VisaStatus visaStatus;
     private String driverLicenseNumber;
     private LocalDate expirationDate;
