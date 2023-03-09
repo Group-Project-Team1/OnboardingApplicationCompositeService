@@ -14,6 +14,8 @@ import com.example.onboardingapplicationcompositeservice.domain.response.VisaSta
 import com.example.onboardingapplicationcompositeservice.security.AuthUserDetail;
 import com.example.onboardingapplicationcompositeservice.service.remote.RemoteApplicationService;
 import com.example.onboardingapplicationcompositeservice.service.remote.RemoteEmployeeService;
+import org.springframework.amqp.core.Message;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,6 +27,7 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -34,6 +37,8 @@ import java.util.List;
 public class OnboardingApplicationCompositeService {
     private RemoteEmployeeService employeeService;
     private RemoteApplicationService applicationService;
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
     @Autowired
     public void setRemoteEmployeeService(RemoteEmployeeService employeeService){
         this.employeeService = employeeService;
@@ -149,6 +154,22 @@ public class OnboardingApplicationCompositeService {
 
     public VisaStatusManagementResponse getVisaStatus(String token, Integer employeeId){
         return applicationService.getVisaStatus(token, employeeId);
+    }
+
+    public ResponseEntity<Object> reviewApplication(String token, Integer employeeId, String action, String feedback){
+        applicationService.reviewApplication(token, employeeId, action, feedback);
+        if(action.equals("approve")){
+            return new ResponseEntity<>("This application has been successfully approved.", HttpStatus.OK);
+        }else{
+            Employee employee = findEmployeeById(token, employeeId);
+            String messageBody = feedback;
+            Message message = new Message(messageBody.getBytes(StandardCharsets.UTF_8));
+            message.getMessageProperties().getHeaders().put("subject", "Feedback of your application");
+            message.getMessageProperties().getHeaders().put("recipient", employee.getEmail());
+            System.out.println(employee.getEmail());
+            rabbitTemplate.convertAndSend("email.direct", "emailKey", message);
+            return new ResponseEntity<>("This application has been successfully rejected. Feedback has been sent to the employee.", HttpStatus.OK);
+        }
     }
 
 }

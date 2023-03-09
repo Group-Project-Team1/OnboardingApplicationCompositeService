@@ -51,4 +51,8 @@ public interface RemoteApplicationService {
     VisaStatusManagementResponse getVisaStatus(@RequestHeader(value = "Authorization", required = true) String authorizationHeader,
                                                @PathVariable Integer employeeId);
 
+    @PostMapping("application-service/hr/viewApplication/{employeeId}")
+    void reviewApplication(@RequestHeader(value = "Authorization", required = true) String authorizationHeader,
+                           @PathVariable Integer employeeId, @RequestParam String action, @RequestParam String feedback);
+
 }
