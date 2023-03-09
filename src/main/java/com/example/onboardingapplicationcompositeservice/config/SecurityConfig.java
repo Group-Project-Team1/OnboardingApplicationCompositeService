@@ -23,9 +23,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
             .csrf().disable()
             .addFilterAfter(jwtFilter, UsernamePasswordAuthenticationFilter.class)
             .authorizeRequests()
-            .antMatchers("composite-housing/user-house-info/*").hasAuthority("employee")
-            .antMatchers("composite-housing/house-detail/*").hasAuthority("hr")
-//                .antMatchers("composite-application/")
+            .antMatchers("/composite-service/composite-housing/user-house-info/*").hasAuthority("employee")
+            .antMatchers("/composite-service/composite-housing/house-detail/*").hasAuthority("hr")
             .anyRequest()
             .authenticated();
     }
