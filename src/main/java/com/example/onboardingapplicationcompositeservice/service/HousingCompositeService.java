@@ -25,8 +25,8 @@ public class HousingCompositeService {
         this.housingService = housingService;
     }
 
-    public Employee findEmployeeById(Integer employeeId){
-        return employeeService.findEmployeeById(employeeId);
+    public Employee findEmployeeById(String token, Integer employeeId){
+        return employeeService.findEmployeeById(token, employeeId);
     }
 
     public House findHouseById(String token, Integer houseId) { return housingService.findHouseById(token, houseId).getHouse(); }

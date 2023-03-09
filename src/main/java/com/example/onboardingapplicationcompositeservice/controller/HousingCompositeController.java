@@ -36,7 +36,7 @@ public class HousingCompositeController {
 
     @GetMapping("user-house-info/{employeeId}")
     public HouseInfoResponse getUserHouseInfo(@PathVariable Integer employeeId){
-        Employee employee = housingCompositeService.findEmployeeById(employeeId);
+        Employee employee = housingCompositeService.findEmployeeById("Bearer:"+jwtProvider.createToken((AuthUserDetail) SecurityContextHolder.getContext().getAuthentication().getPrincipal()), employeeId);
         House house = housingCompositeService.findHouseById( "Bearer:"+jwtProvider.createToken((AuthUserDetail) SecurityContextHolder.getContext().getAuthentication().getPrincipal()), employee.getHouseId());
         List<EmployeeSummary> employeeSummaries = housingCompositeService.findEmployeeSummariesByHouseId(employee.getHouseId());
 

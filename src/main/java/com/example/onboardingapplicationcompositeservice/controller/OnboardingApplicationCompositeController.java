@@ -7,24 +7,30 @@ import com.example.onboardingapplicationcompositeservice.domain.request.Applicat
 import com.example.onboardingapplicationcompositeservice.domain.response.AllApplicationResponse;
 import com.example.onboardingapplicationcompositeservice.domain.response.ApplicationResponse;
 import com.example.onboardingapplicationcompositeservice.domain.response.VisaStatusManagementResponse;
+import com.example.onboardingapplicationcompositeservice.security.AuthUserDetail;
+import com.example.onboardingapplicationcompositeservice.security.JwtProvider;
 import com.example.onboardingapplicationcompositeservice.service.OnboardingApplicationCompositeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("composite")
+@RequestMapping("composite-application")
 public class OnboardingApplicationCompositeController {
     private OnboardingApplicationCompositeService onboardingApplicationCompositeService;
 
     @Autowired
+    private JwtProvider jwtProvider;
+    @Autowired
     public void setOnboardingApplicationCompositeService(OnboardingApplicationCompositeService onboardingApplicationCompositeService){
         this.onboardingApplicationCompositeService = onboardingApplicationCompositeService;
     }
+
 
     /**
      * submit application form
@@ -34,13 +40,13 @@ public class OnboardingApplicationCompositeController {
      * @param OPTReceipt
      * @return
      */
-    @PostMapping(value = "{employeeId}/applicationForm")
+    @PostMapping(value = "/{employeeId}/applicationForm")
     public ResponseEntity<Object> submitApplicationForm(@PathVariable("employeeId") Integer employeeId,
                                                         @RequestPart("applicationFormRequest") ApplicationFormRequest applicationFormRequest,
                                                         @RequestPart("driverLicense") MultipartFile driverLicense,
                                                         @RequestPart("OPTReceipt") MultipartFile OPTReceipt){
 
-        onboardingApplicationCompositeService.submitApplicationForm(employeeId, applicationFormRequest, driverLicense, OPTReceipt);
+        onboardingApplicationCompositeService.submitApplicationForm("Bearer:"+jwtProvider.createToken((AuthUserDetail) SecurityContextHolder.getContext().getAuthentication().getPrincipal()), employeeId, applicationFormRequest, driverLicense, OPTReceipt);
         return new ResponseEntity<>("Application form submitted successfully", HttpStatus.OK);
     }
 
@@ -51,9 +57,9 @@ public class OnboardingApplicationCompositeController {
      * @param files
      * @return
      */
-    @PostMapping("/{employeeId}/application")
+    @PostMapping("{employeeId}/application")
     public ResponseEntity<Object> submitApplication(@PathVariable Integer employeeId, @RequestParam("files") List<MultipartFile> files){
-        onboardingApplicationCompositeService.submitApplication(employeeId, files);
+        onboardingApplicationCompositeService.submitApplication("Bearer:"+jwtProvider.createToken((AuthUserDetail) SecurityContextHolder.getContext().getAuthentication().getPrincipal()), employeeId, files);
         return new ResponseEntity<>("Pleas wait for HR to review your application.", HttpStatus.OK);
     }
 
@@ -63,10 +69,10 @@ public class OnboardingApplicationCompositeController {
      * @param employeeId
      * @return
      */
-    @GetMapping("/{employeeId}/application")
+    @GetMapping("{employeeId}/application")
     public ApplicationResponse getApplication(@PathVariable Integer employeeId){
-        Employee employee = onboardingApplicationCompositeService.findEmployeeById(employeeId);
-        ApplicationWorkFlow applicationWorkFlow = onboardingApplicationCompositeService.getApplicationByEmployeeId(employeeId);
+        Employee employee = onboardingApplicationCompositeService.findEmployeeById("Bearer:"+jwtProvider.createToken((AuthUserDetail) SecurityContextHolder.getContext().getAuthentication().getPrincipal()), employeeId);
+        ApplicationWorkFlow applicationWorkFlow = onboardingApplicationCompositeService.getApplicationByEmployeeId("Bearer:"+jwtProvider.createToken((AuthUserDetail) SecurityContextHolder.getContext().getAuthentication().getPrincipal()), employeeId);
 
         String status = applicationWorkFlow.getStatus();
         if(status.equals("approved")){
@@ -98,7 +104,7 @@ public class OnboardingApplicationCompositeController {
      */
     @GetMapping("/{status}/applications")
     public AllApplicationResponse getApplicationsByStatus(@PathVariable String status){
-        return onboardingApplicationCompositeService.getApplicationsByStatus(status);
+        return onboardingApplicationCompositeService.getApplicationsByStatus("Bearer:"+jwtProvider.createToken((AuthUserDetail) SecurityContextHolder.getContext().getAuthentication().getPrincipal()), status);
     }
 
 
@@ -109,7 +115,7 @@ public class OnboardingApplicationCompositeController {
      */
     @GetMapping("/viewApplication/{employeeId}")
     public ApplicationResponse viewApplication(@PathVariable Integer employeeId){
-        Employee employee = onboardingApplicationCompositeService.findEmployeeById(employeeId);
+        Employee employee = onboardingApplicationCompositeService.findEmployeeById("Bearer:"+jwtProvider.createToken((AuthUserDetail) SecurityContextHolder.getContext().getAuthentication().getPrincipal()), employeeId);
         return ApplicationResponse.builder()
                 .message("")
                 .applicationForm(new ApplicationForm(employee))
@@ -126,12 +132,12 @@ public class OnboardingApplicationCompositeController {
      * @param fileType
      * @return
      */
-    @PostMapping("/{employeeId}/visaStatusManagement")
+    @PostMapping("/employee/{employeeId}/visaStatusManagement")
     public ResponseEntity<Object> submitVisaDocuments(@PathVariable Integer employeeId,
-                                    @RequestPart("fileId") Integer fileId,
-                                    @RequestPart("file") MultipartFile file,
-                                    @RequestPart("fileType") String fileType){
-        onboardingApplicationCompositeService.submitVisaDocuments(employeeId, file, fileId, fileType);
+                                                      @RequestPart("fileId") Integer fileId,
+                                                      @RequestPart("file") MultipartFile file,
+                                                      @RequestPart("fileType") String fileType){
+        onboardingApplicationCompositeService.submitVisaDocuments("Bearer:"+jwtProvider.createToken((AuthUserDetail) SecurityContextHolder.getContext().getAuthentication().getPrincipal()), employeeId, file, fileId, fileType);
         return new ResponseEntity<>("Waiting for HR to approve your " + fileType, HttpStatus.OK);
     }
 
@@ -143,7 +149,7 @@ public class OnboardingApplicationCompositeController {
      */
     @GetMapping("{employeeId}/visaStatusManagement")
     public VisaStatusManagementResponse getVisaStatus(@PathVariable Integer employeeId){
-        return onboardingApplicationCompositeService.getVisaStatus(employeeId);
+        return onboardingApplicationCompositeService.getVisaStatus("Bearer:"+jwtProvider.createToken((AuthUserDetail) SecurityContextHolder.getContext().getAuthentication().getPrincipal()), employeeId);
     }
 
 }

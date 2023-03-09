@@ -25,6 +25,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
             .authorizeRequests()
             .antMatchers("composite-housing/user-house-info/*").hasAuthority("employee")
             .antMatchers("composite-housing/house-detail/*").hasAuthority("hr")
+//                .antMatchers("composite-application/")
             .anyRequest()
             .authenticated();
     }
