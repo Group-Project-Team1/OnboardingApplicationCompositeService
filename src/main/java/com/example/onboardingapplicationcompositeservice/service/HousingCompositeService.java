@@ -31,8 +31,8 @@ public class HousingCompositeService {
 
     public House findHouseById(String token, Integer houseId) { return housingService.findHouseById(token, houseId).getHouse(); }
 
-    public List<EmployeeSummary> findEmployeeSummariesByHouseId(Integer houseId){
-        ResponseEntity<Object> responseEntity = employeeService.findEmployeeSummariesByHouseId(houseId);
+    public List<EmployeeSummary> findEmployeeSummariesByHouseId(String token, Integer houseId){
+        ResponseEntity<Object> responseEntity = employeeService.findEmployeeSummariesByHouseId(token, houseId);
         LinkedHashMap<String,List<LinkedHashMap<String,String>>> linkedHashMap = (LinkedHashMap<String,List<LinkedHashMap<String,String>>>) responseEntity.getBody();
         List<LinkedHashMap<String,String>> employeeSummariesLinkedHashMapList = linkedHashMap.get("data");
 

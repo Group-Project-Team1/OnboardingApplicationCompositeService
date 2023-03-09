@@ -38,7 +38,7 @@ public class HousingCompositeController {
     public HouseInfoResponse getUserHouseInfo(@PathVariable Integer employeeId){
         Employee employee = housingCompositeService.findEmployeeById("Bearer:"+jwtProvider.createToken((AuthUserDetail) SecurityContextHolder.getContext().getAuthentication().getPrincipal()), employeeId);
         House house = housingCompositeService.findHouseById( "Bearer:"+jwtProvider.createToken((AuthUserDetail) SecurityContextHolder.getContext().getAuthentication().getPrincipal()), employee.getHouseId());
-        List<EmployeeSummary> employeeSummaries = housingCompositeService.findEmployeeSummariesByHouseId(employee.getHouseId());
+        List<EmployeeSummary> employeeSummaries = housingCompositeService.findEmployeeSummariesByHouseId("Bearer:"+jwtProvider.createToken((AuthUserDetail) SecurityContextHolder.getContext().getAuthentication().getPrincipal()),employee.getHouseId());
 
         return HouseInfoResponse.builder()
                 .address(house.getAddress())
@@ -51,7 +51,7 @@ public class HousingCompositeController {
     public HouseDetailResponse getHouseDetail(@PathVariable Integer houseId){
 
         House house = housingCompositeService.findHouseById("Bearer:"+jwtProvider.createToken((AuthUserDetail) SecurityContextHolder.getContext().getAuthentication().getPrincipal()), houseId);
-        List<EmployeeSummary> employeeSummaries = housingCompositeService.findEmployeeSummariesByHouseId(houseId);
+        List<EmployeeSummary> employeeSummaries = housingCompositeService.findEmployeeSummariesByHouseId("Bearer:"+jwtProvider.createToken((AuthUserDetail) SecurityContextHolder.getContext().getAuthentication().getPrincipal()),houseId);
 
         return HouseDetailResponse.builder()
                 .house(house)

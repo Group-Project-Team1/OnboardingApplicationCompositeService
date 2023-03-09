@@ -25,7 +25,7 @@ public interface RemoteEmployeeService {
                                                @PathVariable("id") Integer id, @RequestBody PersonalDocument personalDocument);
 
     @GetMapping("employee-service/hr/housing")
-    ResponseEntity<Object> findEmployeeSummariesByHouseId(@RequestParam("houseId") Integer houseId);
+    ResponseEntity<Object> findEmployeeSummariesByHouseId(@RequestHeader(value = "Authorization", required = true) String authorizationHeader, @RequestParam("houseId") Integer houseId);
 
 
 }
