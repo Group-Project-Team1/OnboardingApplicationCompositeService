@@ -1,7 +1,9 @@
 package com.example.onboardingapplicationcompositeservice.service;
 
 import com.example.onboardingapplicationcompositeservice.domain.entity.EmployeeService.Employee;
+import com.example.onboardingapplicationcompositeservice.domain.entity.HouseService.FacilityReport;
 import com.example.onboardingapplicationcompositeservice.domain.entity.HouseService.House;
+import com.example.onboardingapplicationcompositeservice.domain.request.FacilityReportRequest;
 import com.example.onboardingapplicationcompositeservice.domain.response.EmployeeSummary;
 import com.example.onboardingapplicationcompositeservice.service.remote.RemoteEmployeeService;
 import com.example.onboardingapplicationcompositeservice.service.remote.RemoteHousingService;
@@ -52,5 +54,9 @@ public class HousingCompositeService {
         }
 
         return employeeSummaries;
+    }
+
+    public FacilityReport addFacilityReport(String token, FacilityReportRequest facilityReportRequest){
+        return housingService.addFacilityReport(token, facilityReportRequest);
     }
 }

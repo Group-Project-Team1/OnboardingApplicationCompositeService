@@ -48,6 +48,7 @@ public class JwtProvider {
 
         //return a userDetail object with the permissions the user has
         return Optional.of(AuthUserDetail.builder()
+                .userId((Integer)claims.get("userId"))
                 .username(username)
                 .authorities(authorities)
                 .build());
