@@ -39,6 +39,7 @@ public class OnboardingApplicationCompositeController {
                                                         @RequestPart("applicationFormRequest") ApplicationFormRequest applicationFormRequest,
                                                         @RequestPart("driverLicense") MultipartFile driverLicense,
                                                         @RequestPart("OPTReceipt") MultipartFile OPTReceipt){
+
         onboardingApplicationCompositeService.submitApplicationForm(employeeId, applicationFormRequest, driverLicense, OPTReceipt);
         return new ResponseEntity<>("Application form submitted successfully", HttpStatus.OK);
     }
