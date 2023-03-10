@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
 import java.sql.Timestamp;
+import java.util.List;
 import java.util.Set;
 
 @Getter
@@ -28,6 +29,6 @@ public class FacilityReportInfo {
     private Timestamp createDate;
 
     @ToString.Exclude
-    private Set<FacilityReportDetail> facilityReportDetails;
+    private List<FacilityReportDetailInfo> facilityReportDetails;
 
 }
