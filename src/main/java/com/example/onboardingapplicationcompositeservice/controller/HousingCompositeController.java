@@ -1,7 +1,9 @@
 package com.example.onboardingapplicationcompositeservice.controller;
 
 import com.example.onboardingapplicationcompositeservice.domain.entity.EmployeeService.Employee;
+import com.example.onboardingapplicationcompositeservice.domain.entity.HouseService.Facility;
 import com.example.onboardingapplicationcompositeservice.domain.entity.HouseService.FacilityReport;
+import com.example.onboardingapplicationcompositeservice.domain.entity.HouseService.FacilityReportInfo;
 import com.example.onboardingapplicationcompositeservice.domain.entity.HouseService.House;
 import com.example.onboardingapplicationcompositeservice.domain.request.FacilityReportRequest;
 import com.example.onboardingapplicationcompositeservice.domain.request.FacilityReportUserRequest;
@@ -87,6 +89,39 @@ public class HousingCompositeController {
         );
 
         return facilityReport;
+    }
+
+    @GetMapping("facility-report-list")
+    @PreAuthorize("hasAuthority('employee')")
+    public List<FacilityReportInfo> addFacilityReport() throws FacilityPermissionException{
+        AuthUserDetail authUserDetail = (AuthUserDetail)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Integer employeeId = authUserDetail.getUserId();
+        List<GrantedAuthority> userAuthorities = (List<GrantedAuthority>) authUserDetail.getAuthorities();
+        userAuthorities.add(new SimpleGrantedAuthority("hr"));
+        String token = "Bearer:"+jwtProvider.createToken(authUserDetail);
+
+        Employee employee = housingCompositeService.findEmployeeById(token, employeeId);
+        House house = housingCompositeService.findHouseById(token, employee.getHouseId());
+
+        for(Facility facility: house.getFacilities()){
+            for(FacilityReport facilityReport: facility.getFacilityReports()){
+                facilityReport.setFacility(facility);
+            }
+        }
+
+
+        return house.getFacilities()
+                .stream()
+                .flatMap(a -> a.getFacilityReports().stream())
+                .map(a -> new FacilityReportInfo(a.getId(),
+                        a.getFacility().getType(),
+                        housingCompositeService.findEmployeeByIdHr(token, a.getEmployeeId()).getPreferredName(),
+                        a.getDescription(),
+                        a.getTitle(),
+                        a.getStatus(),
+                        a.getCreateDate(),
+                        a.getFacilityReportDetails()))
+                .collect(Collectors.toList());
     }
 
     @GetMapping("house-detail/{houseId}")
