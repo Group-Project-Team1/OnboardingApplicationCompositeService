@@ -1,14 +1,15 @@
 package com.example.onboardingapplicationcompositeservice.domain.response;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.List;
 
 @Getter
 @Setter
 @Builder
+@AllArgsConstructor
+@NoArgsConstructor
+@ToString
 public class AllHouseResponse {
     List<HouseAssignInfo> houseAssignInfo;
 }
