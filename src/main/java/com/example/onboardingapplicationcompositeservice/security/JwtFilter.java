@@ -46,6 +46,8 @@ public class JwtFilter extends OncePerRequestFilter {
 
 //    @Override
 //    protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
-//        return request.getRequestURI().startsWith("/api/employee/");
+//        System.out.println(request.getRequestURI());
+//        return request.getRequestURI().startsWith("/composite-service/auth/")
+//                || request.getRequestURI().startsWith("/composite-service/composite-housing/");
 //    }
 }
