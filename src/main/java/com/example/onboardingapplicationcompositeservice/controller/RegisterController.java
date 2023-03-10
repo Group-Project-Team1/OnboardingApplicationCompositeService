@@ -11,6 +11,8 @@ import com.example.onboardingapplicationcompositeservice.security.JwtProvider;
 import com.example.onboardingapplicationcompositeservice.service.HousingCompositeService;
 import com.example.onboardingapplicationcompositeservice.service.RegisterCompositeService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
@@ -30,10 +32,8 @@ public class RegisterController {
         this.jwtProvider = jwtProvider;
     }
 
-    @PostMapping("user-register/{userId}/{email}/")
-    public void createProfileApplicationAndHouse(@PathVariable("userId") String userId, @PathVariable("email") String email){
-        System.out.println(userId);
-        System.out.println("Email = " + email);
+    @PostMapping("user-register/{userId}/{email}")
+    public ResponseEntity<Object> createProfileApplicationAndHouse(@PathVariable("userId") String userId, @PathVariable("email") String email){
         // Create an employee profile
         Integer id = Integer.parseInt(userId);
         Employee employee = Employee.builder()
@@ -41,13 +41,21 @@ public class RegisterController {
                 .userId(id)
                 .email(email)
                 .build();
-        registerCompositeService.createNewEmployee(employee);
+        registerCompositeService.createNewEmployee(
+                "Bearer:"+jwtProvider.createToken((AuthUserDetail) SecurityContextHolder.getContext().getAuthentication().getPrincipal()),
+                employee
+        );
 
         // Create an application
         registerCompositeService.createNewApplication(id);
 
         // Assign a random house
-        registerCompositeService.assignNewHouse();
+        registerCompositeService.assignNewHouse(
+        "Bearer:"+jwtProvider.createToken((AuthUserDetail) SecurityContextHolder.getContext().getAuthentication().getPrincipal()),
+               id
+        );
+
+        return new ResponseEntity<>("User created successfully", HttpStatus.OK);
     }
 
 }
