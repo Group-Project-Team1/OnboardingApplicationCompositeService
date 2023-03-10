@@ -45,7 +45,9 @@ public interface RemoteApplicationService {
 
     @PostMapping("application-service/employee/{employeeId}/visaStatusManagement")
     void submitVisaDocuments(@RequestHeader(value = "Authorization", required = true) String authorizationHeader,
-                             @PathVariable Integer employeeId, @RequestParam("fileId") Integer fileId);
+                             @PathVariable Integer employeeId,
+                             @RequestParam("fileId") Integer fileId,
+                             @RequestParam("url") String url);
 
     @GetMapping("application-service/employee/{employeeId}/visaStatusManagement")
     VisaStatusManagementResponse getVisaStatus(@RequestHeader(value = "Authorization", required = true) String authorizationHeader,

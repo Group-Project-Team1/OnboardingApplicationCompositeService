@@ -93,7 +93,7 @@ public class OnboardingApplicationCompositeController {
                     .build();
         }else{
             return ApplicationResponse.builder()
-                    .message(applicationWorkFlow.getComment())
+                    .message("Your application has been rejected. Here's hr's feedback: " + applicationWorkFlow.getComment())
                     .applicationForm(new ApplicationForm(employee))
                     .personalDocuments(employee.getPersonalDocuments())
                     .build();

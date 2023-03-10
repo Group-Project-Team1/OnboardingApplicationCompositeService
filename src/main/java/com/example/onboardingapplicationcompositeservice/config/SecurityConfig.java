@@ -20,15 +20,15 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
-            .csrf().disable()
-            .addFilterAfter(jwtFilter, UsernamePasswordAuthenticationFilter.class)
-            .authorizeRequests()
-            .antMatchers("/composite-service/composite-housing/user-house-info").hasAuthority("employee")
-            .antMatchers("/composite-service/composite-housing/house-detail/*").hasAuthority("hr")
-                .antMatchers("/composite-service/composite-application/hr/*").hasAuthority("hr")
-                .antMatchers("/composite-service/composite-application/employee/*").hasAuthority("employee")
-            .anyRequest()
-            .authenticated();
+                .csrf().disable()
+                .addFilterAfter(jwtFilter, UsernamePasswordAuthenticationFilter.class)
+                .authorizeRequests()
+                .antMatchers("/composite-service/composite-housing/user-house-info").hasAuthority("employee")
+                .antMatchers("/composite-service/composite-housing/house-detail/*").hasAuthority("hr")
+                .antMatchers("/composite-service/composite-application/hr/**").hasAuthority("hr")
+                .antMatchers("/composite-service/composite-application/employee/**").hasAuthority("employee")
+                .anyRequest()
+                .authenticated();
     }
 }
 

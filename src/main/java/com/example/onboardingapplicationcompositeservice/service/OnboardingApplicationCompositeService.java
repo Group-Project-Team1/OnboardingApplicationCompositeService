@@ -38,7 +38,7 @@ public class OnboardingApplicationCompositeService {
     private RemoteEmployeeService employeeService;
     private RemoteApplicationService applicationService;
     @Autowired
-    private RabbitTemplate rabbitTemplate;
+    RabbitTemplate rabbitTemplate;
     @Autowired
     public void setRemoteEmployeeService(RemoteEmployeeService employeeService){
         this.employeeService = employeeService;
@@ -149,7 +149,7 @@ public class OnboardingApplicationCompositeService {
         personalDocument.setPath(url);
         personalDocument.setCreateDate(Timestamp.valueOf(LocalDateTime.now()));
         employeeService.addPersonalDocument(token, employeeId, personalDocument);
-        applicationService.submitVisaDocuments(token, employeeId, fileId);
+        applicationService.submitVisaDocuments(token, employeeId, fileId, url);
     }
 
     public VisaStatusManagementResponse getVisaStatus(String token, Integer employeeId){
