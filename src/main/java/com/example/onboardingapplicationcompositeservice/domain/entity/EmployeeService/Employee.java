@@ -11,6 +11,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
+@Builder
 public class Employee {
 
     private Integer id;
@@ -35,6 +36,10 @@ public class Employee {
     private List<VisaStatus> visaStatuses;
     private List<PersonalDocument> personalDocuments = new ArrayList<>();
 
-
+    public Employee(Integer id, Integer userId, String preferredName) {
+        this.id = id;
+        this.userId = userId;
+        this.preferredName = preferredName;
+    }
 }
 

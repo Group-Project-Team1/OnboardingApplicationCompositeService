@@ -59,4 +59,15 @@ public class HousingCompositeService {
     public FacilityReport addFacilityReport(String token, FacilityReportRequest facilityReportRequest){
         return housingService.addFacilityReport(token, facilityReportRequest);
     }
+
+    public Employee findEmployeeByIdHr(String token, Integer employeeId){
+        ResponseEntity<Object> responseEntity = employeeService.findEmployeeByIdHr(token, employeeId);
+        LinkedHashMap<String,Object> linkedHashMap = (LinkedHashMap<String,Object>) responseEntity.getBody();
+        LinkedHashMap<String,Object> employeeLinkedHashMap = (LinkedHashMap<String,Object>)linkedHashMap.get("data");
+        Employee employee = new Employee((Integer)employeeLinkedHashMap.get("id"),
+                (Integer)employeeLinkedHashMap.get("userId"),
+                (String)employeeLinkedHashMap.get("preferredName")
+        );
+        return employee;
+    }
 }

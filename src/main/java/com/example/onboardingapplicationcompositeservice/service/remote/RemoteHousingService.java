@@ -13,6 +13,9 @@ public interface RemoteHousingService {
     @GetMapping("housing-service/house/all")
     AllHouseResponse findAllHouses(@RequestHeader(value = "Authorization", required = true) String authorizationHeader);
 
+    @GetMapping("housing-service/house/employee/all")
+    AllHouseResponse findAllHousesEmployee();
+
     @GetMapping("housing-service/house/{id}")
     HouseResponse findHouseById(@RequestHeader(value = "Authorization", required = true) String authorizationHeader, @PathVariable Integer id);
 
