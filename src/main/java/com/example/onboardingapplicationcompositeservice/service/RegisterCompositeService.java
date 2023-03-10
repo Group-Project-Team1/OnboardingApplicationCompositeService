@@ -45,30 +45,30 @@ public class RegisterCompositeService {
         employeeService.updateEmployee(token, employee);
     }
 
-    public void createNewApplication(Integer employeeId) {
-        applicationService.createNewApplication(employeeId);
+    public void createNewApplication(String token, Integer employeeId) {
+        applicationService.createNewApplication(token, employeeId);
     }
 
     public void assignNewHouse(String token, Integer employeeId) {
         // Find all houses
-        AllHouseResponse allHouseResponse = housingService.findAllHouses(token);
+        AllHouseResponse allHouseResponse = housingService.findAllHousesEmployee(token);
         List<HouseAssignInfo> houses = allHouseResponse.getHouseAssignInfo();
 
         // Filter houses < maxOccupant
-        List<HouseAssignInfo> freeHouses = new ArrayList<>();
-        for (HouseAssignInfo house : houses) {
-            List<EmployeeSummary> employeeSummaries = housingCompositeService.findEmployeeSummariesByHouseId(
-                    token,
-                    house.getHouseId()
-            );
-            if (employeeSummaries.size() < house.getMaxOccupant()) {
-                freeHouses.add(house);
-            }
-        }
+//        List<HouseAssignInfo> freeHouses = new ArrayList<>();
+//        for (HouseAssignInfo house : houses) {
+//            List<EmployeeSummary> employeeSummaries = housingCompositeService.findEmployeeSummariesByHouseId(
+//                    token,
+//                    house.getHouseId()
+//            );
+//            if (employeeSummaries.size() < house.getMaxOccupant()) {
+//                freeHouses.add(house);
+//            }
+//        }
         // Random a free house
         Random random = new Random();
-        Integer randomIdx = random.nextInt(freeHouses.size());
-        Integer houseId = freeHouses.get(randomIdx).getHouseId();
+        Integer randomIdx = random.nextInt(houses.size());
+        Integer houseId = houses.get(randomIdx).getHouseId();
 
         // assign that house to the employee and save the employee
         Employee employee = employeeService.findEmployeeById(token, employeeId);

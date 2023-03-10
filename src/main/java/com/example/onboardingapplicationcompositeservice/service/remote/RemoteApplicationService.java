@@ -55,8 +55,10 @@ public interface RemoteApplicationService {
     void reviewApplication(@RequestHeader(value = "Authorization", required = true) String authorizationHeader,
                            @PathVariable Integer employeeId, @RequestParam String action, @RequestParam String feedback);
 
-    @PostMapping("/application-service/createApplication/{employeeId}")
-    void createNewApplication(@PathVariable Integer employeeId);
+    @PostMapping("application-service/createApplication/{employeeId}")
+    void createNewApplication(
+            @RequestHeader(value = "Authorization", required = true) String authorizationHeader,
+            @PathVariable Integer employeeId);
 
     @PostMapping(value = "application-service/digitalDocuments", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     String uploadFile(@RequestPart("file") MultipartFile multipartFile);

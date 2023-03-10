@@ -16,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -40,14 +41,29 @@ public class RegisterController {
                 .id(id)
                 .userId(id)
                 .email(email)
+                .firstName("firstName")
+                .lastName("lastName")
+                .preferredName("preferredName")
+                .cellPhone("XXX-XXX-XXXX")
+                .alternatePhone("XXX-XXX-XXXX")
+                .gender("male")
+                .ssn("XXX-XX-XXXX")
+                .driverLicense("XXXXXXXXX")
+                .contacts(new ArrayList<>())
+                .addresses(new ArrayList<>())
+                .visaStatuses(new ArrayList<>())
+                .personalDocuments(new ArrayList<>())
                 .build();
         registerCompositeService.createNewEmployee(
-                "Bearer:"+jwtProvider.createToken((AuthUserDetail) SecurityContextHolder.getContext().getAuthentication().getPrincipal()),
+                "Bearer "+jwtProvider.createToken((AuthUserDetail) SecurityContextHolder.getContext().getAuthentication().getPrincipal()),
                 employee
         );
 
         // Create an application
-        registerCompositeService.createNewApplication(id);
+        registerCompositeService.createNewApplication(
+                "Bearer:"+jwtProvider.createToken((AuthUserDetail) SecurityContextHolder.getContext().getAuthentication().getPrincipal()),
+                id
+        );
 
         // Assign a random house
         registerCompositeService.assignNewHouse(
