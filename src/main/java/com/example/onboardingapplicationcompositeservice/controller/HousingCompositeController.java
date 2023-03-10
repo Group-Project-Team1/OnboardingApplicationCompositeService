@@ -1,10 +1,7 @@
 package com.example.onboardingapplicationcompositeservice.controller;
 
 import com.example.onboardingapplicationcompositeservice.domain.entity.EmployeeService.Employee;
-import com.example.onboardingapplicationcompositeservice.domain.entity.HouseService.Facility;
-import com.example.onboardingapplicationcompositeservice.domain.entity.HouseService.FacilityReport;
-import com.example.onboardingapplicationcompositeservice.domain.entity.HouseService.FacilityReportInfo;
-import com.example.onboardingapplicationcompositeservice.domain.entity.HouseService.House;
+import com.example.onboardingapplicationcompositeservice.domain.entity.HouseService.*;
 import com.example.onboardingapplicationcompositeservice.domain.request.FacilityReportRequest;
 import com.example.onboardingapplicationcompositeservice.domain.request.FacilityReportUserRequest;
 import com.example.onboardingapplicationcompositeservice.domain.response.EmployeeSummary;
@@ -120,7 +117,12 @@ public class HousingCompositeController {
                         a.getTitle(),
                         a.getStatus(),
                         a.getCreateDate(),
-                        a.getFacilityReportDetails()))
+                        a.getFacilityReportDetails().stream()
+                                .map(b -> new FacilityReportDetailInfo(housingCompositeService.findEmployeeByIdHr(token, b.getEmployeeId()).getPreferredName(), b.getLastModificationDate(), b.getComment())
+                                )
+                                .collect(Collectors.toList())
+                        )
+                )
                 .collect(Collectors.toList());
     }
 
