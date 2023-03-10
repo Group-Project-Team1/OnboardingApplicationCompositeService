@@ -42,8 +42,9 @@ public class RegisterController {
         Integer id = Integer.parseInt(userId);
         System.out.println("ZERO");
         System.out.println(SecurityContextHolder.getContext().getAuthentication().getPrincipal());
-        Integer employeeId = registerCompositeService.generateEmployeeId();
-        System.out.println(employeeId);
+//        Integer employeeId = registerCompositeService.generateEmployeeId();
+//        System.out.println(employeeId);
+        Integer employeeId = id; // set the employeeId = userId
         Employee employee = Employee.builder()
                 .id(employeeId)
                 .userId(id)
