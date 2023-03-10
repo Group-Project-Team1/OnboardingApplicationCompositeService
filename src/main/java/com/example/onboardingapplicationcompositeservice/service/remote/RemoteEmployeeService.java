@@ -7,6 +7,7 @@ import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.websocket.server.PathParam;
 
 
 @FeignClient("employee-service")
@@ -27,5 +28,6 @@ public interface RemoteEmployeeService {
     @GetMapping("employee-service/hr/housing")
     ResponseEntity<Object> findEmployeeSummariesByHouseId(@RequestHeader(value = "Authorization", required = true) String authorizationHeader, @RequestParam("houseId") Integer houseId);
 
-
+    @GetMapping("employee-service/hr/findById")
+    ResponseEntity<Object> findEmployeeByIdHr(@RequestHeader(value = "Authorization", required = true) String authorizationHeader, @RequestParam("id") Integer id);
 }
